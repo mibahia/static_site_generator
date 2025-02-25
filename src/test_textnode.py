@@ -68,10 +68,6 @@ class TestTextNode(unittest.TestCase):
         self.assertEqual(output_link, expected_output_link)
         self.assertEqual(output_image, expected_output_image)        
 
-
-        
-
-
         
 if __name__ == "__main__":
     unittest.main()
