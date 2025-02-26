@@ -90,11 +90,3 @@ def text_to_textnode(text):
     return nodes
 
 
-
-
-
-if __name__ == "__main__":
-    node = TextNode("This is **text** with an *italic* word and a `code block` and an ![obi wan image](https://i.imgur.com/fJRm4Vk.jpeg) and a [link](https://boot.dev)", TextType.TEXT)
-    text = "This is **text** with an *italic* word and a `code block` and an ![obi wan image](https://i.imgur.com/fJRm4Vk.jpeg) and a [link](https://boot.dev)"
-    print(text_to_textnode(text))
-
