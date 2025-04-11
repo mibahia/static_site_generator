@@ -1,5 +1,6 @@
 import unittest
 from block_markdown import block_to_block_type, BlockType
+from markdown_to_block import markdown_to_html_node, markdown_to_blocks
 
 class TestBlockType(unittest.TestCase):
 
@@ -22,6 +23,22 @@ class TestBlockType(unittest.TestCase):
         self.assertEqual(block_to_block_type(unordered_list), BlockType.UNORDERED_LIST)
         self.assertEqual(block_to_block_type(ordered_list), BlockType.ORDERED_LIST)
         self.assertEqual(block_to_block_type(paragraph), BlockType.PARAGRAPH)
+    
+    def test_paragraph(self):
+        md = """
+        This is **bolded** paragraph
+        text in a p
+        tag here
+            
+        This is another paragraph with _italic_ text and `code` here
+        """
+        
+        node = markdown_to_html_node(md)
+        html = node.to_html()
+        self.assertEqual(
+        html,
+        "<div><p>This is <b>bolded</b> paragraph text in a p tag here</p><p>This is another paragraph with <i>italic</i> text and <code>code</code> here</p></div>",
+    )
 
 
 if __name__ == '__main__':  
