@@ -19,6 +19,9 @@ def markdown_to_blocks(markdown):
     for index,  value in enumerate(markdown.split("\n")):
         if index + 1 == len(markdown.split("\n")):
             break
+        if value == "```":
+            block.append(markdown)
+            break
         if value != "":
             string = value.strip()
             current_delimiter = string[0]
@@ -31,6 +34,7 @@ def markdown_to_blocks(markdown):
     return block
 
 def block_to_block_type(block):
+    block = block.strip()
     lines = block.split("\n")
 
     if block.startswith(("# ", "## ", "### ", "#### ", "##### ", "###### ")):
