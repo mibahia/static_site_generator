@@ -4,6 +4,7 @@ from split_nodes import text_to_textnode
 from text_node import text_node_to_html_node
 import re
 from text_node import TextNode, TextType
+import textwrap
 
 def find_heading_number(block):
     block = block.strip()
@@ -68,6 +69,7 @@ def extract_text_from_block(block, block_type):
 
 # Converts a full markdown document into a HTMLNode + child
 def markdown_to_html_node(markdown):
+    markdown = textwrap.dedent(markdown)
     # Split markdown into blocks
     blocks = markdown_to_blocks(markdown)
     nodes = []
