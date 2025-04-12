@@ -94,6 +94,7 @@ def heading_to_html(block):
 
 # Handles code
 def code_to_html_node(block):
+    block = block.strip()
     if not block.startswith("```") or not block.endswith("```"):
         raise ValueError("invalid code block")
     text = block[4:-3]
@@ -114,7 +115,7 @@ def unordered_list_to_html(block):
     nodes = []
     for item in text:
         children = text_to_children(item)
-        node = ParentNode(tag="li", children=None)
+        node = ParentNode(tag="li", children=children)
         nodes.append(node)
     return ParentNode(tag="ul", children=nodes)
 
@@ -124,44 +125,6 @@ def ordered_list_to_html(block):
     nodes = []
     for item in text:
         children = text_to_children(item)
-        node = ParentNode(tag="li", children=None)
+        node = ParentNode(tag="li", children=children)
         nodes.append(node)
     return ParentNode("ol", children=nodes)
-
-
-# This is the main function
-def create_html_node(blocks):
-    for block in blocks:
-        block_to_block_type(block)
-    
-    pass
-
-if __name__ == "__main__":
-    md = """
-This is **bolded** paragraph
-text in a p
-tag here
-
-This is another paragraph with _italic_ text and `code` here
-
-"""
-
-    list1 = """
-1. First item
-2. Second item
-3. Third item
-4. Fourth item
-"""
-
-    heading = """
-### Heading level 3
-"""
-    # print(paragraph_to_html_node(md).to_html())
-    # paragraph_to_html_node(md).to_html()
-    node = markdown_to_html_node(md)
-    print(node.to_html())
-
-
-
-
-# Next: modify block_to_html_node to add the children
