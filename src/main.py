@@ -1,8 +1,9 @@
-from text_node import TextNode, TextType
+from copy_content import copy_all_contents_to_destination
+
 
 def main():
-    node = TextNode("This is a text node", TextType.BOLD, "https://www.boot.dev/lessons/cdae7fca-a7dc-4706-b2c5-7a03d66db1c9")
-    print(node)
+    copy_all_contents_to_destination("static", "public")
+
 
 if __name__ == "__main__":
     main()
