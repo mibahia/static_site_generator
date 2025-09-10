@@ -1,10 +1,11 @@
-from block_markdown import markdown_to_blocks, block_to_block_type, BlockType
+import re
+import textwrap
+
+from block_markdown import BlockType, block_to_block_type, markdown_to_blocks
 from htmlnode import ParentNode
 from split_nodes import text_to_textnode
-from text_node import text_node_to_html_node
-import re
-from text_node import TextNode, TextType
-import textwrap
+from text_node import TextNode, TextType, text_node_to_html_node
+
 
 def find_heading_number(block):
     block = block.strip()
@@ -28,6 +29,10 @@ def block_to_html_node(block):
         return unordered_list_to_html(block)
     elif block_type == BlockType.ORDERED_LIST:
         return ordered_list_to_html(block)
+    if block_type == BlockType.QUOTE:
+        return quote_to_html(block)
+    raise ValueError("invalid block type")
+
 
 def text_to_children(text):
     children = []
@@ -38,15 +43,16 @@ def text_to_children(text):
         children.append(html_node)
     return children
 
+
 def extract_text_from_block(block, block_type):
     block = block.strip()
     lines = block.split("\n")
     if block_type == BlockType.CODE:
         return "\n".join(lines[1:-1])
-    
+
     elif block_type == BlockType.PARAGRAPH:
         return block
-    
+
     elif block_type in [BlockType.UNORDERED_LIST, BlockType.ORDERED_LIST]:
         processed_lines = []
         for line in lines:
@@ -56,14 +62,14 @@ def extract_text_from_block(block, block_type):
                 line = re.sub(r"^\d+\. ", "", line.lstrip())
             processed_lines.append(line)
         return processed_lines
-    
+
     elif block_type == BlockType.QUOTE:
         processed_lines = []
         for line in lines:
             line = re.sub(r"^> ", "", line.lstrip())
             processed_lines.append(line)
         return "\n".join(processed_lines)
-    
+
     return block
 
 
@@ -76,7 +82,11 @@ def markdown_to_html_node(markdown):
     for block in blocks:
         node = block_to_html_node(block)
         nodes.append(node)
-    return ParentNode(tag="div", children=nodes)
+    # nodes = [n for n in nodes if n is not None]
+    print("HAS NONE:", any(n is None for n in nodes))
+    print([(type(n), getattr(n, "tag", None)) for n in nodes])
+    return ParentNode("div", nodes, None)
+
 
 # Handles paragraph
 def paragraph_to_html_node(block):
@@ -85,12 +95,14 @@ def paragraph_to_html_node(block):
     children = text_to_children(paragraph.strip())
     return ParentNode(tag="p", children=children)
 
+
 # Handles heading
 def heading_to_html(block):
     text = re.sub(r"^#+ ", "", block)
     children = text_to_children(text)
     heading_number = find_heading_number(block)
     return ParentNode(tag=f"h{heading_number}", children=children)
+
 
 # Handles code
 def code_to_html_node(block):
@@ -103,11 +115,13 @@ def code_to_html_node(block):
     code = ParentNode("code", [child])
     return ParentNode("pre", [code])
 
+
 # Handles quote
 def quote_to_html(block):
     text = extract_text_from_block(block, BlockType.QUOTE)
     children = text_to_children(text)
     return ParentNode("blockquote", children=children)
+
 
 # Handles unordered list
 def unordered_list_to_html(block):
@@ -118,6 +132,7 @@ def unordered_list_to_html(block):
         node = ParentNode(tag="li", children=children)
         nodes.append(node)
     return ParentNode(tag="ul", children=nodes)
+
 
 # Handles ordered list
 def ordered_list_to_html(block):
