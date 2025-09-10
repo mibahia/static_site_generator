@@ -82,9 +82,6 @@ def markdown_to_html_node(markdown):
     for block in blocks:
         node = block_to_html_node(block)
         nodes.append(node)
-    # nodes = [n for n in nodes if n is not None]
-    print("HAS NONE:", any(n is None for n in nodes))
-    print([(type(n), getattr(n, "tag", None)) for n in nodes])
     return ParentNode("div", nodes, None)
 
 
