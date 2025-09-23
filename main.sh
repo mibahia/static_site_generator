@@ -1,3 +1,2 @@
-#!/bin/bash
-
-python3 src/main.py
+uv run src/main.py
+cd public && uv run python -m http.server 9999

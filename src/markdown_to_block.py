@@ -44,39 +44,37 @@ def text_to_children(text):
     return children
 
 
-def extract_text_from_block(block, block_type):
-    block = block.strip()
-    lines = block.split("\n")
-    if block_type == BlockType.CODE:
-        return "\n".join(lines[1:-1])
+# def extract_text_from_block(block, block_type):
+#     block = block.strip()
+#     lines = block.split("\n")
+#     if block_type == BlockType.CODE:
+#         return "\n".join(lines[1:-1])
 
-    elif block_type == BlockType.PARAGRAPH:
-        return block
+#     elif block_type == BlockType.PARAGRAPH:
+#         return block
 
-    elif block_type in [BlockType.UNORDERED_LIST, BlockType.ORDERED_LIST]:
-        processed_lines = []
-        for line in lines:
-            if block_type == BlockType.UNORDERED_LIST:
-                line = re.sub(r"^\* |^- |^\+ ", "", line.lstrip())
-            else:
-                line = re.sub(r"^\d+\. ", "", line.lstrip())
-            processed_lines.append(line)
-        return processed_lines
+#     elif block_type in [BlockType.UNORDERED_LIST, BlockType.ORDERED_LIST]:
+#         processed_lines = []
+#         for line in lines:
+#             if block_type == BlockType.UNORDERED_LIST:
+#                 line = re.sub(r"^\* |^- |^\+ ", "", line.lstrip())
+#             else:
+#                 line = re.sub(r"^\d+\. ", "", line.lstrip())
+#             processed_lines.append(line)
+#         return processed_lines
 
-    elif block_type == BlockType.QUOTE:
-        processed_lines = []
-        for line in lines:
-            line = re.sub(r"^> ", "", line.lstrip())
-            processed_lines.append(line)
-        return "\n".join(processed_lines)
+#     elif block_type == BlockType.QUOTE:
+#         processed_lines = []
+#         for line in lines:
+#             line = re.sub(r"^> ", "", line.lstrip())
+#             processed_lines.append(line)
+#         return "\n".join(processed_lines)
 
-    return block
+#     return block
 
 
 # Converts a full markdown document into a HTMLNode + child
 def markdown_to_html_node(markdown):
-    markdown = textwrap.dedent(markdown)
-    # Split markdown into blocks
     blocks = markdown_to_blocks(markdown)
     nodes = []
     for block in blocks:
@@ -89,21 +87,27 @@ def markdown_to_html_node(markdown):
 def paragraph_to_html_node(block):
     lines = block.split("\n")
     paragraph = " ".join(lines)
-    children = text_to_children(paragraph.strip())
+    children = text_to_children(paragraph)
     return ParentNode(tag="p", children=children)
 
 
 # Handles heading
 def heading_to_html(block):
-    text = re.sub(r"^#+ ", "", block)
+    level = 0
+    for char in block:
+        if char == "#":
+            level += 1
+        else:
+            break
+    if level + 1 >= len(block):
+        raise ValueError(f"invalid heading level: {level}")
+    text = block[level + 1 :]
     children = text_to_children(text)
-    heading_number = find_heading_number(block)
-    return ParentNode(tag=f"h{heading_number}", children=children)
+    return ParentNode(f"h{level}", children)
 
 
 # Handles code
 def code_to_html_node(block):
-    block = block.strip()
     if not block.startswith("```") or not block.endswith("```"):
         raise ValueError("invalid code block")
     text = block[4:-3]
@@ -115,28 +119,34 @@ def code_to_html_node(block):
 
 # Handles quote
 def quote_to_html(block):
-    text = extract_text_from_block(block, BlockType.QUOTE)
-    children = text_to_children(text)
-    return ParentNode("blockquote", children=children)
+    lines = block.split("\n")
+    new_lines = []
+    for line in lines:
+        if not line.startswith(">"):
+            raise ValueError("invalid quote block")
+        new_lines.append(line.lstrip(">").strip())
+    content = " ".join(new_lines)
+    children = text_to_children(content)
+    return ParentNode("blockquote", children)
 
 
 # Handles unordered list
 def unordered_list_to_html(block):
-    text = extract_text_from_block(block, BlockType.UNORDERED_LIST)
-    nodes = []
-    for item in text:
-        children = text_to_children(item)
-        node = ParentNode(tag="li", children=children)
-        nodes.append(node)
-    return ParentNode(tag="ul", children=nodes)
+    items = block.split("\n")
+    html_items = []
+    for item in items:
+        text = item[2:]
+        children = text_to_children(text)
+        html_items.append(ParentNode("li", children))
+    return ParentNode("ul", html_items)
 
 
 # Handles ordered list
 def ordered_list_to_html(block):
-    text = extract_text_from_block(block, BlockType.ORDERED_LIST)
-    nodes = []
-    for item in text:
-        children = text_to_children(item)
-        node = ParentNode(tag="li", children=children)
-        nodes.append(node)
-    return ParentNode("ol", children=nodes)
+    items = block.split("\n")
+    html_items = []
+    for item in items:
+        text = item[3:]
+        children = text_to_children(text)
+        html_items.append(ParentNode("li", children))
+    return ParentNode("ol", html_items)
