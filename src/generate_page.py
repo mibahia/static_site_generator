@@ -39,15 +39,11 @@ def generate_pages_recursive(dir_path_content, template_path, dest_dir_path):
         return
 
     all_dir = os.listdir(dir_path_content)
-    print(f"all_dir: {all_dir}")
 
     if len(all_dir) == 0:
         return
 
     for path in all_dir:
-        print(f"path: {path}")
         new_dest_path = os.path.join(dest_dir_path, path)
         current_path = os.path.join(dir_path_content, path)
-        print(f"current path: {current_path}")
-        print(f"new path: {new_dest_path}")
         generate_pages_recursive(current_path, template_path, new_dest_path)
