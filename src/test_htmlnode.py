@@ -3,13 +3,14 @@ import unittest
 from htmlnode import HTMLNode, LeafNode, ParentNode
 from text_node import TextNode, TextType, text_node_to_html_node
 
+
 class TestHTMLNode(unittest.TestCase):
     def test_eq(self):
         html_node = HTMLNode(tag="p", value="this is a test")
         html_node1 = HTMLNode(tag="p", value="this is a test")
 
         self.assertEqual(html_node, html_node1)
-    
+
     def test_in(self):
         html_node2 = HTMLNode(tag="a", value="this is a test")
         html_node3 = HTMLNode(tag="p", value="this is a test")
@@ -29,12 +30,13 @@ class TestHTMLNode(unittest.TestCase):
     def test_leaf_eq(self):
         leaf_node = LeafNode(tag="a", value="this is a test")
         leaf_node1 = LeafNode(tag="a", value="this is a test")
-        
 
         self.assertEqual(leaf_node, leaf_node1)
-    
+
     def test_to_html(self):
-        leaf_node3 = LeafNode(tag="a", value="Click me!", props={"href": "https://www.google.com"})
+        leaf_node3 = LeafNode(
+            tag="a", value="Click me!", props={"href": "https://www.google.com"}
+        )
 
         expected_output = '<a href="https://www.google.com">Click me!</a>'
 
@@ -83,7 +85,7 @@ class TestHTMLNode(unittest.TestCase):
             node.to_html(),
             "<h2><b>Bold text</b>Normal text<i>italic text</i>Normal text</h2>",
         )
-    
+
     def test_text_node_to_html_node(self):
         node = TextNode("Hello, world!", TextType.TEXT)
         html_node = text_node_to_html_node(node)
